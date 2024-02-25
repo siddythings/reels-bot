@@ -1,5 +1,5 @@
 from enum import Enum
-from services.inc24.inc24 import INC24
+from services.inc42.inc42 import INC42
 
 
 class ServiceProviderFactory(Enum):
@@ -17,6 +17,6 @@ class ServiceProviderFactory(Enum):
     @staticmethod
     def get_provider(provider_name):
         if ServiceProviderFactory.value_of(provider_name) == ServiceProviderFactory.INC42:
-            return INC24()
+            return INC42()
         else:
             raise "Invalid service provider"

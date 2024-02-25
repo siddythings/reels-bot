@@ -3,7 +3,7 @@ import requests
 from bs4 import BeautifulSoup
 
 
-class INC24(ServiceProvider):
+class INC42(ServiceProvider):
     def __init__(self) -> None:
         super().__init__()
 
@@ -62,7 +62,7 @@ class INC24(ServiceProvider):
                 'https://inc42.com/wp-admin/admin-ajax.php', cookies=cookies, headers=headers, data=data)
 
             # Parse the HTML using BeautifulSoup
-            soup = BeautifulSoup(response, 'html.parser')
+            soup = BeautifulSoup(response.text, 'html.parser')
 
             # Find all 'a' tags within the specified class
             all_links = soup.find_all('a', class_='recommended-block-head')
