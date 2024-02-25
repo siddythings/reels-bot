@@ -44,3 +44,15 @@ def text_to_image(text, output_image_path, font_size=72, max_width=1272, font_pa
         y_position += text_height
 
     image.save(output_image_path)
+
+
+def resize_image(width, filename):
+    base_width = width
+    img = Image.open(filename)
+
+    w_percent = (base_width / float(img.size[0]))
+    h_size = int((float(img.size[1]) * float(w_percent)))
+
+    # Use Image.LANCZOS for resampling
+    img = img.resize((base_width, h_size), Image.LANCZOS)
+    img.save(filename)
