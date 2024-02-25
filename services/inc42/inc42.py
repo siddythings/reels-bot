@@ -1,6 +1,11 @@
 from services.provider import ServiceProvider
 import requests
 from bs4 import BeautifulSoup
+from PIL import Image, ImageDraw, ImageFont
+from bs4 import BeautifulSoup
+from playwright.sync_api import sync_playwright, ViewportSize
+from helper_functions import *
+from moviepy.editor import AudioFileClip, CompositeAudioClip, concatenate_audioclips
 
 
 class INC42(ServiceProvider):
@@ -82,8 +87,113 @@ class INC42(ServiceProvider):
 
         return post_data
 
-    def get_images(self):
-        pass
+    def get_images(self, screen_objects):
+        with sync_playwright() as p:
+            iphone_11 = p.devices["iPhone 11 Pro Max"]
+            browser = p.chromium.launch()
+            context = browser.new_context(**iphone_11)
+            page = context.new_page()
+            page.goto(
+                screen_objects.get("href_value"),
+                timeout=0,
+            )
+            flag = False
+            page.set_viewport_size(ViewportSize(width=448, height=1800))
+            # page.reload(timeout=0)
+
+            if page.locator(".entry-title").is_visible():
+                page.locator(".entry-title").screenshot(
+                    path=f'results/temp/1/one.png'
+                )
+                flag = True
+            # if page.locator("div.single-featured-thumb").is_visible():
+            #     page.locator("div.single-featured-thumb").screenshot(
+            #         path=f'results/temp/1/two.png'
+            #     )
+            #     flag = True
+            test = page.locator(
+                '.single-post-summary').inner_html()
+
+            soup = BeautifulSoup(test, 'html.parser')
+
+            # Find the 'h4' tag with text 'SUMMARY'
+            summary_tag = soup.find('h4', text='SUMMARY')
+
+            # If 'SUMMARY' tag is found, get the text of the first <p> block after it
+            if summary_tag:
+                # Find the first <p> tag after the 'SUMMARY' tag
+                first_p_after_summary = summary_tag.find_next('p')
+
+                # Get the text of the <p> block
+                if first_p_after_summary:
+                    summary_text = first_p_after_summary.get_text(strip=True)
+                    text_to_image(
+                        summary_text, "results/temp/1/summary_text.png", max_width=1272)
+                    save_image_from_url(screen_objects.get(
+                        "image_url"), "results/temp/1/two.png")
+                    screen_objects.update({
+                        "summary_text": summary_text
+                    })
+            browser.close()
+
+        max_width = 1272
+
+        use_images = [
+            "common/header.png",
+            "results/temp/1/one.png",
+            "results/temp/1/two.png",
+            "results/temp/1/summary_text.png",
+            "common/footer.png"
+        ]
+        # # To check if all the image are same height
+        # images = [Image.open(x) for x in use_images]
+
+        # for i, img in enumerate(images):
+        #     if img.size[0] > max_width:
+        #         resize_image(max_width, use_images[i])
+
+        images = [Image.open(x) for x in use_images]
+
+        if images:
+            total_width = 0
+            max_height = 0
+
+            # find the width and height of the final image
+            for img in images:
+                total_width = max(total_width, img.size[0])
+                # total_width = img.size[0]
+                max_height += img.size[1]
+
+            # create a new image with the appropriate height and width
+            new_img = Image.new("RGBA", (total_width, max_height))
+            # Write the contents of the new image
+            current_width = 0
+            new_img.paste(images[0], (current_width, 0))
+            current_width += images[0].size[1]
+            for img in range(1, len(images)):
+                new_img.paste(images[img], (0, current_width))
+                current_width += images[img].size[1]
+        # Save the image
+
+        new_img.save(
+            "results/temp/1/final.png"
+        )
+
+    def create_audio(self, screen_objects):
+        from IPython.display import Audio
+        from bark import SAMPLE_RATE, generate_audio, preload_models
+        text_prompt = screen_objects.get("summary_text")
+        speech_array = generate_audio(
+            text_prompt, history_prompt="v2/en_speaker_6")
+        with open(f"results/temp/1/0.mp3", "wb") as audio_file:
+            audio_file.write(Audio(speech_array, rate=SAMPLE_RATE).data)
+
+        clip = AudioFileClip(
+            f"results/temp/1/0.mp3"
+        )
+        length = clip.duration
+        clip.close()
+        return length, 1
 
     def create_video(self):
         pass
