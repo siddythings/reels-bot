@@ -1,6 +1,8 @@
 from PIL import Image
 from PIL import Image, ImageDraw, ImageFont
 from bs4 import BeautifulSoup
+import requests
+from io import BytesIO
 
 
 def text_to_image(text, output_image_path, font_size=72, max_width=1272, font_path="Hind-Light.ttf"):
@@ -56,3 +58,15 @@ def resize_image(width, filename):
     # Use Image.LANCZOS for resampling
     img = img.resize((base_width, h_size), Image.LANCZOS)
     img.save(filename)
+
+
+def save_image_from_url(url, path):
+    max_width = 1272
+    response = requests.get(url)
+    if response.status_code == 200:
+        img = Image.open(BytesIO(response.content))
+        img.save(path)
+        resize_image(max_width, path)
+        print('Image saved successfully.')
+    else:
+        print('Failed to download image. Status code:', response.status_code)
