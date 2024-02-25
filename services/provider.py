@@ -9,7 +9,11 @@ class ServiceProvider(ABC):
         pass
 
     @abstractmethod
-    def get_images(self):
+    def get_images(self, screen_objects):
+        pass
+
+    @abstractmethod
+    def create_audio(self, screen_objects):
         pass
 
     @abstractmethod
