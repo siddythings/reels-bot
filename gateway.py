@@ -16,5 +16,5 @@ class Gateway:
     def create_audio(self, screen_objects):
         return self._provider.create_audio(screen_objects)
 
-    def create_video(self):
-        return self._provider.create_video()
+    def create_video(self, length, screen_objects):
+        return self._provider.create_video(length, screen_objects)
