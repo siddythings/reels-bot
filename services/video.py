@@ -17,8 +17,8 @@ class Video:
 
     @staticmethod
     def _create_watermark(text, redditid, fontsize, opacity=0.5):
-        id = re.sub(r"[^\w\s-]", "", redditid["thread_id"])
-        path = f"results/temp/1/watermark.png"
+        # id = re.sub(r"[^\w\s-]", "", redditid["thread_id"])
+        path = f"results/temp/{redditid}/watermark.png"
         width = int(fontsize * len(text))
         height = int(fontsize * len(text) / 2)
         white = (255, 255, 255)
@@ -78,25 +78,12 @@ class Video:
             ndigits=2,
         )
         position = (compensation, position[1])
-        # print(f'{compensation=}')
-        # print(f'{position=}')
         img_clip = self._create_watermark(
             text, redditid, fontsize=fontsize, opacity=opacity
         )
-        # img_clip_image = self._create_image_watermark(
-        #     text, redditid, fontsize=fontsize, opacity=0
-        # )
         img_clip = img_clip.set_opacity(opacity).set_duration(duration - 1)
         img_clip = img_clip.set_position(
             position, relative=True
-        )  # todo get dara from utils/CONSTANTS.py and adapt position accordingly
-
-        # img_clip_image = img_clip_image.set_duration(duration - 1)
-        # img_clip_image = img_clip_image.set_position(
-        #     ("center", 1600)
-        # )  # todo get dara from utils/CONSTANTS.py and adapt position accordingly
-
-        # Overlay the img clip on the first video clip
-        # self.video = CompositeVideoClip([self.video, img_clip])
+        )
         self.video = CompositeVideoClip([self.video])
         return self.video

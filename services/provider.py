@@ -17,5 +17,5 @@ class ServiceProvider(ABC):
         pass
 
     @abstractmethod
-    def create_video(self):
+    def create_video(self, length, screen_objects):
         pass
