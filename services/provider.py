@@ -5,7 +5,7 @@ class ServiceProvider(ABC):
     """Provider Class is the abstraction over the Utility provider"""
 
     @abstractmethod
-    def get_posts(self, number_of_page):
+    def get_posts(self, screen_objects):
         pass
 
     @abstractmethod

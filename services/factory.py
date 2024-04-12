@@ -1,9 +1,11 @@
 from enum import Enum
 from services.inc42.inc42 import INC42
+from services.leetcode.leetcode import Leetcode
 
 
 class ServiceProviderFactory(Enum):
     INC42 = "INC42"
+    LEETCODE = "LEETCODE"
     UNKNOWN = "UNKNOWN"
 
     @classmethod
@@ -18,5 +20,7 @@ class ServiceProviderFactory(Enum):
     def get_provider(provider_name):
         if ServiceProviderFactory.value_of(provider_name) == ServiceProviderFactory.INC42:
             return INC42()
+        if ServiceProviderFactory.value_of(provider_name) == ServiceProviderFactory.LEETCODE:
+            return Leetcode()
         else:
             raise "Invalid service provider"
